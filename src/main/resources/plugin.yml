@@ -1,0 +1,9 @@
+name: SurvivalIsland
+description: $description
+version: '${version}'
+
+main: com.github.Glatinis.survivalIsland.SurvivalIsland
+api-version: '26.2'
+load: POSTWORLD
+
+authors: [ Glatinis ]
