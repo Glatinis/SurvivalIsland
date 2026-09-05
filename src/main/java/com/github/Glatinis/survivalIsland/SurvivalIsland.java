@@ -11,6 +11,9 @@ import com.github.Glatinis.survivalIsland.containment.NaturalSpawnListener;
 import com.github.Glatinis.survivalIsland.containment.SpawnSubCommand;
 import com.github.Glatinis.survivalIsland.contestant.ContestantManager;
 import com.github.Glatinis.survivalIsland.contestant.ContestantSubCommand;
+import com.github.Glatinis.survivalIsland.effects.AcidOceanManager;
+import com.github.Glatinis.survivalIsland.effects.AcidRainManager;
+import com.github.Glatinis.survivalIsland.effects.EventSubCommand;
 import com.github.Glatinis.survivalIsland.integration.WorldGuardHook;
 import com.github.Glatinis.survivalIsland.lives.LivesScoreboardService;
 import com.github.Glatinis.survivalIsland.lives.PlayerLifecycleListener;
@@ -34,6 +37,7 @@ public final class SurvivalIsland extends JavaPlugin {
     private TheftManager theftManager;
     private ProtectionManager protectionManager;
     private EntityBoundsGuard entityBoundsGuard;
+    private AcidOceanManager acidOceanManager;
     private SurvivalIslandCommand rootCommand;
 
     @Override
@@ -75,6 +79,11 @@ public final class SurvivalIsland extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new CommandModeChatListener(commandModeManager, this), this);
         rootCommand.register(new CommandModeSubCommand(commandModeManager, configManager));
 
+        AcidRainManager acidRainManager = new AcidRainManager(this, configManager, contestantManager, worldGuardHook);
+        acidOceanManager = new AcidOceanManager(this, configManager, contestantManager, worldGuardHook);
+        acidOceanManager.start();
+        rootCommand.register(new EventSubCommand(acidRainManager, acidOceanManager));
+
         getCommand("survivalisland").setExecutor(rootCommand);
         getCommand("survivalisland").setTabCompleter(rootCommand);
     }
@@ -83,6 +92,9 @@ public final class SurvivalIsland extends JavaPlugin {
     public void onDisable() {
         if (entityBoundsGuard != null) {
             entityBoundsGuard.stop();
+        }
+        if (acidOceanManager != null) {
+            acidOceanManager.stopTask();
         }
     }
 
