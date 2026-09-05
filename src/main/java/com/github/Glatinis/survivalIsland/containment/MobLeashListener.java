@@ -3,6 +3,7 @@ package com.github.Glatinis.survivalIsland.containment;
 import com.github.Glatinis.survivalIsland.config.ConfigManager;
 import com.github.Glatinis.survivalIsland.integration.WorldGuardHook;
 import com.destroystokyo.paper.event.entity.EntityPathfindEvent;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -30,6 +31,11 @@ public final class MobLeashListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
         LivingEntity entity = event.getEntity();
+        if (entity.getType() == EntityType.ENDER_DRAGON) {
+            // ender dragons are tracked against the whole-arena bound instead - see
+            // DragonBlockGuardListener.
+            return;
+        }
         worldGuardHook.regionIdAt(entity.getLocation(), configManager.islands())
             .ifPresent(islandId -> entityBoundsGuard.track(entity, islandId));
     }

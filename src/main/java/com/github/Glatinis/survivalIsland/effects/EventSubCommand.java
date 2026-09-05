@@ -2,6 +2,7 @@ package com.github.Glatinis.survivalIsland.effects;
 
 import com.github.Glatinis.survivalIsland.command.SubCommand;
 import com.github.Glatinis.survivalIsland.util.Messages;
+import com.github.Glatinis.survivalIsland.worldcontrol.DragonControlManager;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -19,11 +20,14 @@ public final class EventSubCommand implements SubCommand {
     private final AcidRainManager acidRainManager;
     private final AcidOceanManager acidOceanManager;
     private final DeepFreezeManager deepFreezeManager;
+    private final DragonControlManager dragonControlManager;
 
-    public EventSubCommand(AcidRainManager acidRainManager, AcidOceanManager acidOceanManager, DeepFreezeManager deepFreezeManager) {
+    public EventSubCommand(AcidRainManager acidRainManager, AcidOceanManager acidOceanManager,
+                            DeepFreezeManager deepFreezeManager, DragonControlManager dragonControlManager) {
         this.acidRainManager = acidRainManager;
         this.acidOceanManager = acidOceanManager;
         this.deepFreezeManager = deepFreezeManager;
+        this.dragonControlManager = dragonControlManager;
     }
 
     @Override
@@ -39,7 +43,7 @@ public final class EventSubCommand implements SubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            Messages.error(sender, "Usage: /survivalisland event <acidrain|acidocean|deepfreeze> ...");
+            Messages.error(sender, "Usage: /survivalisland event <acidrain|acidocean|deepfreeze|enderdragon> ...");
             return;
         }
 
@@ -47,7 +51,26 @@ public final class EventSubCommand implements SubCommand {
             case "acidrain" -> handleAcidRain(sender, args);
             case "acidocean" -> handleAcidOcean(sender, args);
             case "deepfreeze" -> handleDeepFreeze(sender, args);
-            default -> Messages.error(sender, "Usage: /survivalisland event <acidrain|acidocean|deepfreeze> ...");
+            case "enderdragon" -> handleEnderDragon(sender, args);
+            default -> Messages.error(sender, "Usage: /survivalisland event <acidrain|acidocean|deepfreeze|enderdragon> ...");
+        }
+    }
+
+    private void handleEnderDragon(CommandSender sender, String[] args) {
+        if (args.length < 3 || !args[1].equalsIgnoreCase("destruction")) {
+            Messages.error(sender, "Usage: /survivalisland event enderdragon destruction <on|off>");
+            return;
+        }
+        switch (args[2].toLowerCase()) {
+            case "on" -> {
+                dragonControlManager.setDestructionEnabled(true);
+                Messages.success(sender, "Ender dragons can now destroy blocks.");
+            }
+            case "off" -> {
+                dragonControlManager.setDestructionEnabled(false);
+                Messages.success(sender, "Ender dragons can no longer destroy blocks.");
+            }
+            default -> Messages.error(sender, "Usage: /survivalisland event enderdragon destruction <on|off>");
         }
     }
 
@@ -145,10 +168,16 @@ public final class EventSubCommand implements SubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            return filter(List.of("acidrain", "acidocean", "deepfreeze"), args[0]);
+            return filter(List.of("acidrain", "acidocean", "deepfreeze", "enderdragon"), args[0]);
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("deepfreeze")) {
             return filter(List.of("on", "off"), args[1]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("enderdragon")) {
+            return filter(List.of("destruction"), args[1]);
+        }
+        if (args.length == 3 && args[0].equalsIgnoreCase("enderdragon") && args[1].equalsIgnoreCase("destruction")) {
+            return filter(List.of("on", "off"), args[2]);
         }
         if (args.length == 2) {
             List<String> options = new ArrayList<>();

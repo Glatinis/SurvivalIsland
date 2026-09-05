@@ -18,6 +18,8 @@ import com.github.Glatinis.survivalIsland.effects.EventSubCommand;
 import com.github.Glatinis.survivalIsland.integration.WorldGuardHook;
 import com.github.Glatinis.survivalIsland.lives.LivesScoreboardService;
 import com.github.Glatinis.survivalIsland.lives.PlayerLifecycleListener;
+import com.github.Glatinis.survivalIsland.worldcontrol.DragonBlockGuardListener;
+import com.github.Glatinis.survivalIsland.worldcontrol.DragonControlManager;
 import com.github.Glatinis.survivalIsland.worldcontrol.ProtectionListener;
 import com.github.Glatinis.survivalIsland.worldcontrol.ProtectionManager;
 import com.github.Glatinis.survivalIsland.worldcontrol.PvpListener;
@@ -84,7 +86,12 @@ public final class SurvivalIsland extends JavaPlugin {
         acidOceanManager = new AcidOceanManager(this, configManager, contestantManager, worldGuardHook);
         acidOceanManager.start();
         DeepFreezeManager deepFreezeManager = new DeepFreezeManager(this, configManager, worldGuardHook);
-        rootCommand.register(new EventSubCommand(acidRainManager, acidOceanManager, deepFreezeManager));
+
+        DragonControlManager dragonControlManager = new DragonControlManager();
+        getServer().getPluginManager().registerEvents(
+            new DragonBlockGuardListener(dragonControlManager, entityBoundsGuard), this);
+
+        rootCommand.register(new EventSubCommand(acidRainManager, acidOceanManager, deepFreezeManager, dragonControlManager));
 
         getCommand("survivalisland").setExecutor(rootCommand);
         getCommand("survivalisland").setTabCompleter(rootCommand);
