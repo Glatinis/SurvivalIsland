@@ -14,7 +14,8 @@ import org.bukkit.event.inventory.InventoryOpenEvent;
 /**
  * Enforces {@link TheftManager}: while theft is off, only the assigned contestant of an island
  * may open containers physically located on that island. Containers outside any island (or any
- * non-block inventory, like a player's own inventory) are never guarded.
+ * non-block inventory, like a player's own inventory) are never guarded. Ops bypass this
+ * entirely.
  */
 public final class TheftListener implements Listener {
 
@@ -38,7 +39,7 @@ public final class TheftListener implements Listener {
         }
 
         HumanEntity opener = event.getPlayer();
-        if (!(opener instanceof Player player)) {
+        if (!(opener instanceof Player player) || player.isOp()) {
             return;
         }
 

@@ -15,9 +15,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Enforces {@link ProtectionManager}'s three global modes for ordinary block break/place. The
- * safe-tower region is always fully protected, checked before the mode itself - see
- * {@link TntExplosionListener} for the one exception to island protection (TNT).
+ * Enforces {@link ProtectionManager}'s three global modes for ordinary block break/place. Ops
+ * bypass everything, including the safe tower. Otherwise the safe-tower region is always fully
+ * protected, checked before the mode itself - see {@link TntExplosionListener} for the one
+ * exception to island protection (TNT).
  */
 public final class ProtectionListener implements Listener {
 
@@ -49,6 +50,10 @@ public final class ProtectionListener implements Listener {
     }
 
     private boolean isAllowed(Player player, Location location) {
+        if (player.isOp()) {
+            return true;
+        }
+
         List<String> candidates = new ArrayList<>(configManager.islands());
         candidates.add(configManager.safeTowerRegion());
 
