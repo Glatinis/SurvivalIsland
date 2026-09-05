@@ -1,6 +1,9 @@
 package com.github.Glatinis.survivalIsland;
 
 import com.github.Glatinis.survivalIsland.command.SurvivalIslandCommand;
+import com.github.Glatinis.survivalIsland.commandmode.CommandModeChatListener;
+import com.github.Glatinis.survivalIsland.commandmode.CommandModeManager;
+import com.github.Glatinis.survivalIsland.commandmode.CommandModeSubCommand;
 import com.github.Glatinis.survivalIsland.config.ConfigManager;
 import com.github.Glatinis.survivalIsland.containment.EntityBoundsGuard;
 import com.github.Glatinis.survivalIsland.containment.MobLeashListener;
@@ -67,6 +70,11 @@ public final class SurvivalIsland extends JavaPlugin {
         rootCommand.register(new ContestantSubCommand(contestantManager, configManager));
         rootCommand.register(new RuleSubCommand(pvpManager, theftManager, protectionManager));
         rootCommand.register(new SpawnSubCommand(contestantManager, configManager, entityBoundsGuard));
+
+        CommandModeManager commandModeManager = new CommandModeManager(configManager);
+        getServer().getPluginManager().registerEvents(new CommandModeChatListener(commandModeManager, this), this);
+        rootCommand.register(new CommandModeSubCommand(commandModeManager, configManager));
+
         getCommand("survivalisland").setExecutor(rootCommand);
         getCommand("survivalisland").setTabCompleter(rootCommand);
     }
