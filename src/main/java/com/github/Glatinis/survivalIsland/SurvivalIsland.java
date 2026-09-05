@@ -5,6 +5,8 @@ import com.github.Glatinis.survivalIsland.config.ConfigManager;
 import com.github.Glatinis.survivalIsland.contestant.ContestantManager;
 import com.github.Glatinis.survivalIsland.contestant.ContestantSubCommand;
 import com.github.Glatinis.survivalIsland.integration.WorldGuardHook;
+import com.github.Glatinis.survivalIsland.lives.LivesScoreboardService;
+import com.github.Glatinis.survivalIsland.lives.PlayerLifecycleListener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class SurvivalIsland extends JavaPlugin {
@@ -12,6 +14,7 @@ public final class SurvivalIsland extends JavaPlugin {
     private ConfigManager configManager;
     private WorldGuardHook worldGuardHook;
     private ContestantManager contestantManager;
+    private LivesScoreboardService livesScoreboardService;
     private SurvivalIslandCommand rootCommand;
 
     @Override
@@ -23,6 +26,10 @@ public final class SurvivalIsland extends JavaPlugin {
 
         contestantManager = new ContestantManager(this);
         contestantManager.load();
+
+        livesScoreboardService = new LivesScoreboardService(this, configManager);
+        livesScoreboardService.setup();
+        getServer().getPluginManager().registerEvents(new PlayerLifecycleListener(livesScoreboardService), this);
 
         rootCommand = new SurvivalIslandCommand();
         rootCommand.register(new ContestantSubCommand(contestantManager, configManager));
