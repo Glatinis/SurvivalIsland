@@ -2,6 +2,7 @@ package com.github.Glatinis.survivalIsland;
 
 import com.github.Glatinis.survivalIsland.command.SurvivalIslandCommand;
 import com.github.Glatinis.survivalIsland.config.ConfigManager;
+import com.github.Glatinis.survivalIsland.containment.NaturalSpawnListener;
 import com.github.Glatinis.survivalIsland.contestant.ContestantManager;
 import com.github.Glatinis.survivalIsland.contestant.ContestantSubCommand;
 import com.github.Glatinis.survivalIsland.integration.WorldGuardHook;
@@ -51,6 +52,7 @@ public final class SurvivalIsland extends JavaPlugin {
         getServer().getPluginManager().registerEvents(
             new ProtectionListener(protectionManager, contestantManager, worldGuardHook, configManager), this);
         getServer().getPluginManager().registerEvents(new TntExplosionListener(worldGuardHook, configManager), this);
+        getServer().getPluginManager().registerEvents(new NaturalSpawnListener(configManager, worldGuardHook), this);
 
         rootCommand = new SurvivalIslandCommand();
         rootCommand.register(new ContestantSubCommand(contestantManager, configManager));
