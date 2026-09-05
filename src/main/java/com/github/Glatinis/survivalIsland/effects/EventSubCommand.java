@@ -18,10 +18,12 @@ public final class EventSubCommand implements SubCommand {
 
     private final AcidRainManager acidRainManager;
     private final AcidOceanManager acidOceanManager;
+    private final DeepFreezeManager deepFreezeManager;
 
-    public EventSubCommand(AcidRainManager acidRainManager, AcidOceanManager acidOceanManager) {
+    public EventSubCommand(AcidRainManager acidRainManager, AcidOceanManager acidOceanManager, DeepFreezeManager deepFreezeManager) {
         this.acidRainManager = acidRainManager;
         this.acidOceanManager = acidOceanManager;
+        this.deepFreezeManager = deepFreezeManager;
     }
 
     @Override
@@ -37,14 +39,33 @@ public final class EventSubCommand implements SubCommand {
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (args.length == 0) {
-            Messages.error(sender, "Usage: /survivalisland event <acidrain|acidocean> <player|all> <start|stop>");
+            Messages.error(sender, "Usage: /survivalisland event <acidrain|acidocean|deepfreeze> ...");
             return;
         }
 
         switch (args[0].toLowerCase()) {
             case "acidrain" -> handleAcidRain(sender, args);
             case "acidocean" -> handleAcidOcean(sender, args);
-            default -> Messages.error(sender, "Usage: /survivalisland event <acidrain|acidocean> <player|all> <start|stop>");
+            case "deepfreeze" -> handleDeepFreeze(sender, args);
+            default -> Messages.error(sender, "Usage: /survivalisland event <acidrain|acidocean|deepfreeze> ...");
+        }
+    }
+
+    private void handleDeepFreeze(CommandSender sender, String[] args) {
+        if (args.length < 2) {
+            Messages.error(sender, "Usage: /survivalisland event deepfreeze <on|off>");
+            return;
+        }
+        switch (args[1].toLowerCase()) {
+            case "on" -> {
+                deepFreezeManager.turnOn();
+                Messages.success(sender, "Deep freeze is now on.");
+            }
+            case "off" -> {
+                deepFreezeManager.turnOff();
+                Messages.success(sender, "Deep freeze is now off.");
+            }
+            default -> Messages.error(sender, "Usage: /survivalisland event deepfreeze <on|off>");
         }
     }
 
@@ -124,7 +145,10 @@ public final class EventSubCommand implements SubCommand {
     @Override
     public List<String> tabComplete(CommandSender sender, String[] args) {
         if (args.length == 1) {
-            return filter(List.of("acidrain", "acidocean"), args[0]);
+            return filter(List.of("acidrain", "acidocean", "deepfreeze"), args[0]);
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("deepfreeze")) {
+            return filter(List.of("on", "off"), args[1]);
         }
         if (args.length == 2) {
             List<String> options = new ArrayList<>();
