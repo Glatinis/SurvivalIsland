@@ -12,7 +12,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 /**
  * Enforces {@link PvpManager}: player-vs-player damage is cancelled while PvP is globally off,
  * unless either side has bought it. Snowballs and fishing rods always land regardless of PvP
- * state, per the client's ask.
+ * state, per the client's ask. An op attacker always bypasses the restriction.
  */
 public final class PvpListener implements Listener {
 
@@ -34,7 +34,7 @@ public final class PvpListener implements Listener {
         }
 
         Player attacker = resolveAttacker(damager);
-        if (attacker == null || attacker.equals(victim)) {
+        if (attacker == null || attacker.equals(victim) || attacker.isOp()) {
             return;
         }
 
