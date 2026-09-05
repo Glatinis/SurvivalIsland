@@ -3,6 +3,7 @@ package com.github.Glatinis.survivalIsland.containment;
 import com.github.Glatinis.survivalIsland.config.ConfigManager;
 import com.github.Glatinis.survivalIsland.integration.WorldGuardHook;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
@@ -23,7 +24,7 @@ public final class NaturalSpawnListener implements Listener {
         this.worldGuardHook = worldGuardHook;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
     public void onSpawn(CreatureSpawnEvent event) {
         if (configManager.blockedNaturalSpawnReasons().contains(event.getSpawnReason())) {
             event.setCancelled(true);

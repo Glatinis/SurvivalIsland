@@ -2,7 +2,10 @@ package com.github.Glatinis.survivalIsland;
 
 import com.github.Glatinis.survivalIsland.command.SurvivalIslandCommand;
 import com.github.Glatinis.survivalIsland.config.ConfigManager;
+import com.github.Glatinis.survivalIsland.containment.EntityBoundsGuard;
+import com.github.Glatinis.survivalIsland.containment.MobLeashListener;
 import com.github.Glatinis.survivalIsland.containment.NaturalSpawnListener;
+import com.github.Glatinis.survivalIsland.containment.SpawnSubCommand;
 import com.github.Glatinis.survivalIsland.contestant.ContestantManager;
 import com.github.Glatinis.survivalIsland.contestant.ContestantSubCommand;
 import com.github.Glatinis.survivalIsland.integration.WorldGuardHook;
@@ -27,6 +30,7 @@ public final class SurvivalIsland extends JavaPlugin {
     private PvpManager pvpManager;
     private TheftManager theftManager;
     private ProtectionManager protectionManager;
+    private EntityBoundsGuard entityBoundsGuard;
     private SurvivalIslandCommand rootCommand;
 
     @Override
@@ -54,16 +58,24 @@ public final class SurvivalIsland extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new TntExplosionListener(worldGuardHook, configManager), this);
         getServer().getPluginManager().registerEvents(new NaturalSpawnListener(configManager, worldGuardHook), this);
 
+        entityBoundsGuard = new EntityBoundsGuard(this, configManager, worldGuardHook);
+        entityBoundsGuard.start();
+        getServer().getPluginManager().registerEvents(
+            new MobLeashListener(entityBoundsGuard, worldGuardHook, configManager), this);
+
         rootCommand = new SurvivalIslandCommand();
         rootCommand.register(new ContestantSubCommand(contestantManager, configManager));
         rootCommand.register(new RuleSubCommand(pvpManager, theftManager, protectionManager));
+        rootCommand.register(new SpawnSubCommand(contestantManager, configManager, entityBoundsGuard));
         getCommand("survivalisland").setExecutor(rootCommand);
         getCommand("survivalisland").setTabCompleter(rootCommand);
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        if (entityBoundsGuard != null) {
+            entityBoundsGuard.stop();
+        }
     }
 
     public ConfigManager configManager() {

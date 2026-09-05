@@ -62,19 +62,6 @@ public final class Cuboid {
         return x >= minX && x <= maxX && y >= minY && y <= maxY && z >= minZ && z <= maxZ;
     }
 
-    /**
-     * Horizontal-only containment check (ignores Y) - used to apply a separate Y-ceiling clamp
-     * for flying mobs without treating "too high" as "outside the island".
-     */
-    public boolean containsHorizontally(Location location) {
-        if (location.getWorld() == null || !location.getWorld().equals(world)) {
-            return false;
-        }
-        double x = location.getX();
-        double z = location.getZ();
-        return x >= minX && x <= maxX && z >= minZ && z <= maxZ;
-    }
-
     public Location clamp(Location location) {
         double x = Math.max(minX, Math.min(maxX, location.getX()));
         double y = Math.max(minY, Math.min(maxY, location.getY()));
