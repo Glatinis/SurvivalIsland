@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * {@code /survivalisland event <acidrain|acidocean> <player|all> <start|stop>} - the gift-effect
- * commands. (Deep Freeze and ender dragon control join this same category once built.)
+ * {@code /survivalisland event <acidrain|acidocean|deepfreeze|enderdragon> ...} - the gift-effect
+ * and dragon-control commands.
  */
 public final class EventSubCommand implements SubCommand {
 
