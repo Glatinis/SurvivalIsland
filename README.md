@@ -70,7 +70,79 @@ Requires the `survivalisland.commandmode` permission.
 
 ## Configuration
 
-All tunables (starting lives, effect damage and duration, containment interval, region names, command mode triggers) live in `config.yml`. Contestant assignments persist in `contestants.yml`.
+Every tunable lives in `config.yml`, generated on first run. Contestant to island assignments are saved separately in `contestants.yml` and do not need to be edited by hand.
+
+### lives
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `starting-lives` | `20` | Lives every player starts with. |
+| `scoreboard-title-json` | (see file) | Adventure JSON text used as the sidebar scoreboard title. |
+
+### command-mode
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `triggers` | `{}` | Map of trigger word to a list of console commands to run. `%player%` is replaced with the name of whoever typed the trigger. |
+
+### acid-rain
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `duration-ticks` | `8000` | How long the storm lasts before automatically stopping. |
+| `tick-interval` | `20` | How often (in ticks) damage and poison are reapplied. |
+| `player-damage` | `1.0` | Damage dealt to the targeted player each tick. |
+| `mob-damage` | `2.0` | Damage dealt to passive and tameable mobs on the target's island each tick. |
+| `poison-amplifier` | `0` | Poison effect level applied to the target. |
+| `poison-duration-ticks` | `8100` | How long each poison application lasts, refreshed every tick so it never runs out mid storm. |
+
+### acid-ocean
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `tick-interval` | `10` | How often submerged targets are checked and damaged. |
+| `player-damage` | `2.0` | Damage dealt while the target is in water. |
+| `poison-amplifier` | `0` | Poison effect level applied while submerged. |
+| `poison-duration-ticks` | `60` | How long each poison application lasts. |
+| `restrict-to-island` | `false` | If `true`, only damages the target while they are in water on their own island instead of anywhere. |
+
+### deep-freeze
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `duration-ticks` | `18000` | How long the freeze lasts (18000 ticks is 15 minutes) before automatically reverting. |
+| `region` | `"arena"` | WorldGuard region whose water is converted to ice. Falls back to the arena box below if the region does not exist. |
+| `slowness-amplifier` | `1` | Slowness effect level applied to every player while active. |
+
+### containment
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `check-interval-ticks` | `10` | How often leashed mobs and ender dragons are checked against their bounds. |
+| `arena.world` | `"world"` | World the arena box is in. |
+| `arena.min` / `arena.max` | `[-500, 0, -500]` / `[500, 256, 500]` | Corners of the box ender dragons are confined to, and the fallback area for deep freeze. |
+| `safe-tower-region` | `"safe-tower"` | WorldGuard region where nothing can ever spawn or be broken. |
+
+### islands
+
+A list of the WorldGuard region ids treated as islands, for example `["island1", "island2", "island3"]`. Used by contestant assignment, protection, and theft.
+
+### protection
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `default-mode` | `LOCKED` | Starting protection mode: `LOCKED`, `OWN_ISLAND_ONLY`, or `FREE_FOR_ALL`. |
+
+### natural-spawn-block-reasons
+
+A list of Bukkit `SpawnReason` values that are always cancelled, so mobs only ever appear from gift commands, spawn eggs, or spawners. Defaults to `NATURAL`, `CHUNK_GEN`, `PATROL`, `VILLAGE_DEFENSE`, `VILLAGE_INVASION`, `RAID`, and `REINFORCEMENTS`.
+
+### pvp / theft
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `pvp.default-enabled` | `true` | Whether PvP is on when the server starts. |
+| `theft.default-enabled` | `false` | Whether players can open containers outside their own island when the server starts. |
 
 ## Building
 
