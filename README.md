@@ -79,3 +79,7 @@ All tunables (starting lives, effect damage and duration, containment interval, 
 ```
 
 The built jar is placed in `build/libs`.
+
+## Author
+
+Made by [Glatinis](https://github.com/Glatinis). For help or issues, open a GitHub issue or reach out directly via Fiverr.
