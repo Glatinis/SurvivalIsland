@@ -1,0 +1,49 @@
+lives:
+  starting-lives: 20
+  scoreboard-title-json: '{"text":"✦ ","color":"yellow","bold":true,"extra":[{"text":"L I V E S","color":"aqua","bold":true},{"text":" ✦","color":"yellow","bold":true}]}'
+
+command-mode:
+  # trigger -> list of console commands. %player% is replaced with the operator's own name.
+  triggers: {}
+
+acid-rain:
+  duration-ticks: 8000
+  tick-interval: 20
+  player-damage: 1.0
+  mob-damage: 2.0
+  poison-amplifier: 0
+  poison-duration-ticks: 8100
+
+acid-ocean:
+  tick-interval: 10
+  player-damage: 2.0
+  poison-amplifier: 0
+  poison-duration-ticks: 60
+  restrict-to-island: false
+
+deep-freeze:
+  duration-ticks: 18000
+  region: "arena"
+  slowness-amplifier: 1
+
+containment:
+  check-interval-ticks: 10
+  arena:
+    world: "world"
+    min: [ -500, 0, -500 ]
+    max: [ 500, 256, 500 ]
+  safe-tower-region: "safe-tower"
+
+islands: [ "island1", "island2", "island3" ]
+
+protection:
+  default-mode: LOCKED
+
+natural-spawn-block-reasons:
+  [ NATURAL, CHUNK_GEN, PATROL, VILLAGE_DEFENSE, VILLAGE_INVASION, RAID, REINFORCEMENTS ]
+
+pvp:
+  default-enabled: true
+
+theft:
+  default-enabled: false

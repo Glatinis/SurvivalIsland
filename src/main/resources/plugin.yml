@@ -7,3 +7,18 @@ api-version: '26.2'
 load: POSTWORLD
 
 authors: [ Glatinis ]
+
+depend: [WorldGuard]
+softdepend: [WorldEdit]
+
+commands:
+  survivalisland:
+    aliases: [si]
+    usage: /survivalisland <commandmode|event|rule|spawn|contestant> ...
+    permission: survivalisland.admin
+
+permissions:
+  survivalisland.admin:
+    default: op
+  survivalisland.commandmode:
+    default: op
