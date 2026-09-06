@@ -209,6 +209,37 @@ public final class DeepFreezeManager {
         }
     }
 
+    /**
+     * Utility for undoing {@link #coverIslandsWithSnow} manually - clears any thin snow layer
+     * sitting on top of the surface across every island. Not tied to whether deep freeze is
+     * currently active, and treats any thin snow layer found there as fair game to remove, since
+     * it's meant purely for cleaning up the deep-freeze effect's mark rather than trying to
+     * distinguish it from snow that got there some other way.
+     */
+    public void clearSnow() {
+        World world = configManager.arenaCuboid().world();
+        for (String islandId : configManager.islands()) {
+            worldGuardHook.regionCuboid(world, islandId).ifPresent(this::clearSnowFrom);
+        }
+    }
+
+    private void clearSnowFrom(Cuboid area) {
+        World world = area.world();
+        int minX = (int) Math.floor(area.minX());
+        int maxX = (int) Math.floor(area.maxX());
+        int minZ = (int) Math.floor(area.minZ());
+        int maxZ = (int) Math.floor(area.maxZ());
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                Block top = world.getHighestBlockAt(x, z);
+                if (top.getType() == Material.SNOW) {
+                    top.setType(Material.AIR);
+                }
+            }
+        }
+    }
+
     private boolean isDeepfreezeSnowball(ItemStack item) {
         if (item == null || item.getType() != Material.SNOWBALL) {
             return false;

@@ -76,7 +76,7 @@ public final class EventSubCommand implements SubCommand {
 
     private void handleDeepFreeze(CommandSender sender, String[] args) {
         if (args.length < 2) {
-            Messages.error(sender, "Usage: /survivalisland event deepfreeze <on|off>");
+            Messages.error(sender, "Usage: /survivalisland event deepfreeze <on|off|clearsnow>");
             return;
         }
         switch (args[1].toLowerCase()) {
@@ -88,7 +88,11 @@ public final class EventSubCommand implements SubCommand {
                 deepFreezeManager.turnOff();
                 Messages.success(sender, "Deep freeze is now off.");
             }
-            default -> Messages.error(sender, "Usage: /survivalisland event deepfreeze <on|off>");
+            case "clearsnow" -> {
+                deepFreezeManager.clearSnow();
+                Messages.success(sender, "Cleared the deep freeze snow layer from every island.");
+            }
+            default -> Messages.error(sender, "Usage: /survivalisland event deepfreeze <on|off|clearsnow>");
         }
     }
 
@@ -171,7 +175,7 @@ public final class EventSubCommand implements SubCommand {
             return filter(List.of("acidrain", "acidocean", "deepfreeze", "enderdragon"), args[0]);
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("deepfreeze")) {
-            return filter(List.of("on", "off"), args[1]);
+            return filter(List.of("on", "off", "clearsnow"), args[1]);
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("enderdragon")) {
             return filter(List.of("destruction"), args[1]);
