@@ -148,6 +148,10 @@ Every tunable lives in `config.yml`, generated on first run. Contestant to islan
 
 A list of the WorldGuard region ids treated as islands, for example `["island1", "island2", "island3"]`. Used by contestant assignment, protection, and theft.
 
+### islands-land
+
+Optional, same order as `islands`. If your island regions include a bit of shoreline or ocean (a common reason to draw them a little larger than the dry land), leashed mobs would otherwise be free to wander into that water since it's technically still "in bounds." Draw one more, tighter WorldGuard region per island that hugs just the dry land (for example `island1-land`) and list them here in the same order, mob containment will use these tighter regions instead of the full island ones. Leave empty, or shorter than `islands`, to skip this and just use each island's own region.
+
 ### protection
 
 | Key | Default | Description |
