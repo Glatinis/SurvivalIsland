@@ -46,6 +46,8 @@ Every online player sees the lives board, but only assigned contestants get an a
 
 Every lives value is mirrored to `lives.yml` as it changes and restored automatically, so a server crash or restart mid-show does not reset anyone's lives back to full. Removing a contestant clears their saved value too, so a later re-add starts them fresh rather than resuming their old count.
 
+A contestant is automatically switched to spectator mode the moment their lives hit 0, and switched back to survival mode if a `/survivalisland lives add` brings them back above 0.
+
 ### Rule
 
 | Command | Description |
