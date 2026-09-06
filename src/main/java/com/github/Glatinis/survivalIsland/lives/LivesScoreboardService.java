@@ -1,6 +1,7 @@
 package com.github.Glatinis.survivalIsland.lives;
 
 import com.github.Glatinis.survivalIsland.config.ConfigManager;
+import com.github.Glatinis.survivalIsland.contestant.ContestantManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
@@ -14,9 +15,11 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
 /**
- * Owns the sidebar "lives" objective. The Score itself is the only store of truth for a
- * player's lives - there is deliberately no separate in-memory map, so an admin can also just
- * run the vanilla {@code /scoreboard players set <player> lives <value>} command and it works.
+ * Owns the sidebar "lives" objective. Only assigned contestants ever get a row on it - the
+ * Score itself is still the only store of truth for a contestant's lives (no separate in-memory
+ * map), so an admin can also just run the vanilla
+ * {@code /scoreboard players set <player> lives <value>} command and it works, on top of the
+ * dedicated {@code /survivalisland lives} command.
  */
 public final class LivesScoreboardService {
 
@@ -24,12 +27,14 @@ public final class LivesScoreboardService {
 
     private final JavaPlugin plugin;
     private final ConfigManager configManager;
+    private final ContestantManager contestantManager;
     private Scoreboard scoreboard;
     private Objective objective;
 
-    public LivesScoreboardService(JavaPlugin plugin, ConfigManager configManager) {
+    public LivesScoreboardService(JavaPlugin plugin, ConfigManager configManager, ContestantManager contestantManager) {
         this.plugin = plugin;
         this.configManager = configManager;
+        this.contestantManager = contestantManager;
     }
 
     public void setup() {
@@ -44,23 +49,58 @@ public final class LivesScoreboardService {
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
     }
 
-    public void applyTo(Player player) {
+    /**
+     * Shows the board and initializes a score for the player if they're an assigned contestant;
+     * otherwise makes sure they don't have a stale row left over from before.
+     */
+    public void refresh(Player player) {
         if (scoreboard == null || objective == null) {
             return;
         }
-        player.setScoreboard(scoreboard);
-        Score score = objective.getScore(player.getName());
-        if (!score.isScoreSet()) {
-            score.setScore(configManager.startingLives());
+        if (contestantManager.islandOf(player).isPresent()) {
+            player.setScoreboard(scoreboard);
+            Score score = objective.getScore(player.getName());
+            if (!score.isScoreSet()) {
+                score.setScore(configManager.startingLives());
+            }
+        } else {
+            remove(player);
         }
     }
 
     public void decrement(Player player) {
-        if (objective == null) {
+        if (objective == null || contestantManager.islandOf(player).isEmpty()) {
             return;
         }
         Score score = objective.getScore(player.getName());
-        score.setScore(score.getScore() - 1);
+        score.setScore(Math.max(0, score.getScore() - 1));
+    }
+
+    /**
+     * Sets a contestant's lives to an absolute value (clamped to 0 or above). Returns the value
+     * actually applied.
+     */
+    public int setLives(Player player, int value) {
+        int clamped = Math.max(0, value);
+        if (objective != null) {
+            objective.getScore(player.getName()).setScore(clamped);
+        }
+        return clamped;
+    }
+
+    /**
+     * Adds (or, with a negative delta, subtracts) from a contestant's current lives, clamped to 0
+     * or above. Returns the resulting value.
+     */
+    public int addLives(Player player, int delta) {
+        if (objective == null) {
+            return 0;
+        }
+        Score score = objective.getScore(player.getName());
+        int current = score.isScoreSet() ? score.getScore() : configManager.startingLives();
+        int updated = Math.max(0, current + delta);
+        score.setScore(updated);
+        return updated;
     }
 
     public void remove(Player player) {

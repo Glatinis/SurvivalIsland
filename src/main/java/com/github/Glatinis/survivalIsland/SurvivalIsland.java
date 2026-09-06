@@ -53,7 +53,7 @@ public final class SurvivalIsland extends JavaPlugin {
         contestantManager = new ContestantManager(this);
         contestantManager.load();
 
-        livesScoreboardService = new LivesScoreboardService(this, configManager);
+        livesScoreboardService = new LivesScoreboardService(this, configManager, contestantManager);
         livesScoreboardService.setup();
         getServer().getPluginManager().registerEvents(new PlayerLifecycleListener(livesScoreboardService), this);
 
@@ -74,7 +74,7 @@ public final class SurvivalIsland extends JavaPlugin {
             new MobLeashListener(entityBoundsGuard, worldGuardHook, configManager), this);
 
         rootCommand = new SurvivalIslandCommand();
-        rootCommand.register(new ContestantSubCommand(contestantManager, configManager));
+        rootCommand.register(new ContestantSubCommand(contestantManager, configManager, livesScoreboardService));
         rootCommand.register(new RuleSubCommand(pvpManager, theftManager, protectionManager));
         rootCommand.register(new SpawnSubCommand(contestantManager, configManager, entityBoundsGuard));
 

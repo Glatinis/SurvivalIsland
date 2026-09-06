@@ -19,7 +19,7 @@ public final class PlayerLifecycleListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        livesScoreboardService.applyTo(event.getPlayer());
+        livesScoreboardService.refresh(event.getPlayer());
     }
 
     @EventHandler
