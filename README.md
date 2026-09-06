@@ -6,7 +6,7 @@
 ![Java](https://img.shields.io/badge/Java-25-orange)
 ![WorldGuard](https://img.shields.io/badge/WorldGuard-7.0.17-green)
 
-A Paper plugin for running a multi-island survival show: a lives based elimination scoreboard, gift triggered effects, contestant to island management, and mob and world containment built on top of WorldGuard and WorldEdit.
+A Paper plugin for running a multi-island survival show: a lives based elimination scoreboard, gift triggered effects, restocking loot chests, contestant to island management, and mob and world containment built on top of WorldGuard and WorldEdit.
 
 ## Requirements
 
@@ -77,6 +77,17 @@ Requires the `survivalisland.commandmode` permission.
 | `/survivalisland commandmode start` | Chat messages are read as triggers instead of being sent publicly. |
 | `/survivalisland commandmode stop` | Returns chat to normal. |
 | `/survivalisland commandmode reload` | Reloads the trigger map from `config.yml`. |
+
+### Chest
+
+Look directly at a chest before running these.
+
+| Command | Description |
+| --- | --- |
+| `/survivalisland chest mark [interval-seconds] [item-count]` | Marks the chest so it periodically clears and refills itself from the loot pool. Both arguments are optional and override the configured defaults for that chest only. |
+| `/survivalisland chest unmark` | Stops a chest from restocking. |
+| `/survivalisland chest restock` | Forces an already-marked chest to restock immediately. |
+| `/survivalisland chest list` | Shows how many restocking chests are currently tracked. |
 
 ## Configuration
 
@@ -153,6 +164,16 @@ A list of Bukkit `SpawnReason` values that are always cancelled, so mobs only ev
 | --- | --- | --- |
 | `pvp.default-enabled` | `true` | Whether PvP is on when the server starts. |
 | `theft.default-enabled` | `false` | Whether players can open containers outside their own island when the server starts. |
+
+### restocking-chests
+
+| Key | Default | Description |
+| --- | --- | --- |
+| `default-interval-ticks` | `6000` | How often a marked chest restocks (6000 ticks is 5 minutes), unless overridden per-chest with `/survivalisland chest mark`. |
+| `default-item-count` | `5` | How many random rolls fill a chest per restock, unless overridden per-chest. |
+| `loot-pool` | (see file) | The pool restocks draw from. Each entry is `{ material, amount, weight }`, plus an optional `potion` (a `PotionType` name) for `POTION`, `SPLASH_POTION`, or `LINGERING_POTION` entries. Higher weight means more common. |
+
+Note: Minecraft doesn't have separate "blue egg" or "brown egg" items, both just show up in the pool as a plain `EGG` entry. Marked chest locations are saved in `restocking-chests.yml` and reload automatically on startup, but each chest's restock timer restarts from zero rather than resuming exactly where it left off.
 
 ## Building
 
