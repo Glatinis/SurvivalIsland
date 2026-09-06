@@ -17,6 +17,7 @@ import com.github.Glatinis.survivalIsland.effects.DeepFreezeManager;
 import com.github.Glatinis.survivalIsland.effects.EventSubCommand;
 import com.github.Glatinis.survivalIsland.integration.WorldGuardHook;
 import com.github.Glatinis.survivalIsland.lives.LivesScoreboardService;
+import com.github.Glatinis.survivalIsland.lives.LivesSubCommand;
 import com.github.Glatinis.survivalIsland.lives.PlayerLifecycleListener;
 import com.github.Glatinis.survivalIsland.worldcontrol.DragonBlockGuardListener;
 import com.github.Glatinis.survivalIsland.worldcontrol.DragonControlManager;
@@ -75,6 +76,7 @@ public final class SurvivalIsland extends JavaPlugin {
 
         rootCommand = new SurvivalIslandCommand();
         rootCommand.register(new ContestantSubCommand(contestantManager, configManager, livesScoreboardService));
+        rootCommand.register(new LivesSubCommand(livesScoreboardService, contestantManager));
         rootCommand.register(new RuleSubCommand(pvpManager, theftManager, protectionManager));
         rootCommand.register(new SpawnSubCommand(contestantManager, configManager, entityBoundsGuard));
 
