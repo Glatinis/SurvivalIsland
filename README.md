@@ -63,7 +63,7 @@ A contestant is automatically switched to spectator mode the moment their lives 
 | --- | --- |
 | `/survivalisland event acidrain <player\|all> <start\|stop>` | Personal acid rainstorm: damages the target and nearby island animals, applies poison. |
 | `/survivalisland event acidocean <player\|all> <start\|stop>` | Water becomes lethal like lava (without fire) plus poison for the target. |
-| `/survivalisland event deepfreeze <on\|off>` | Converts water to ice in the configured area, slows every player for the configured duration, and fills the area with falling snow particles. Every contestant is also given an unlimited "Deepfreeze!" snowball for the duration. Everything (ice, slowness, snow, snowballs) reverts when it ends. |
+| `/survivalisland event deepfreeze <on\|off>` | Converts water to ice in the configured area, slows every player for the configured duration, fills the area with falling snow particles, and gives every contestant an unlimited "Deepfreeze!" snowball. The ice, slowness, particles, and snowballs all revert when it ends - except one thing: every exposed grass block on each island gets a permanent thin snow layer the moment it turns on, which is never cleared. |
 | `/survivalisland event enderdragon destruction <on\|off>` | Allows or blocks ender dragons from destroying blocks. |
 
 ### Spawn
