@@ -34,6 +34,16 @@ All commands live under `/survivalisland` (alias `/si`) and require the `surviva
 | `/survivalisland contestant remove <player>` | Clears a player's island assignment. |
 | `/survivalisland contestant list` | Lists every current contestant to island assignment. |
 
+### Lives
+
+Only assigned contestants get a row on the lives scoreboard, and only they can be targeted by these commands. Since lives are stored in a real scoreboard objective named `lives`, the vanilla `/scoreboard players set <player> lives <value>` command also works as an alternative.
+
+| Command | Description |
+| --- | --- |
+| `/survivalisland lives set <player> <amount>` | Sets a contestant's lives to an exact value. |
+| `/survivalisland lives add <player> <amount>` | Adds to a contestant's lives. |
+| `/survivalisland lives remove <player> <amount>` | Subtracts from a contestant's lives. |
+
 ### Rule
 
 | Command | Description |
@@ -76,7 +86,7 @@ Every tunable lives in `config.yml`, generated on first run. Contestant to islan
 
 | Key | Default | Description |
 | --- | --- | --- |
-| `starting-lives` | `20` | Lives every player starts with. |
+| `starting-lives` | `20` | Lives every contestant starts with. |
 | `scoreboard-title-json` | (see file) | Adventure JSON text used as the sidebar scoreboard title. |
 
 ### command-mode
