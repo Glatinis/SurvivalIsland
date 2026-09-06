@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -145,6 +146,22 @@ public final class ConfigManager {
 
     public List<String> islands() {
         return config().getStringList("islands");
+    }
+
+    /**
+     * Resolves an island id to its tighter land-only WorldGuard region, if one is configured at
+     * the matching position in {@code islands-land} - used to keep mobs off the water when the
+     * island's own region includes some shoreline/ocean buffer. Empty if not configured for that
+     * island, in which case callers should fall back to the island's own region.
+     */
+    public Optional<String> landRegionFor(String islandId) {
+        List<String> islands = islands();
+        List<String> landRegions = config().getStringList("islands-land");
+        int index = islands.indexOf(islandId);
+        if (index >= 0 && index < landRegions.size()) {
+            return Optional.of(landRegions.get(index));
+        }
+        return Optional.empty();
     }
 
     public String defaultProtectionMode() {

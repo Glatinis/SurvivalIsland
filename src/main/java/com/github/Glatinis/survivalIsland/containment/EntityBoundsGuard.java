@@ -81,14 +81,25 @@ public final class EntityBoundsGuard {
             .orElse(true);
     }
 
+    /**
+     * Resolves the actual containment box for a bound id. For an island bound, this prefers the
+     * island's tighter land-only region (see {@link ConfigManager#landRegionFor}) over the full
+     * island region if one is configured, so leashed mobs stay off the water even when the full
+     * island region includes some shoreline/ocean buffer. Falls back to the island's own region
+     * if no land region is configured for it.
+     */
     private Optional<Cuboid> boundCuboid(String boundId, World world) {
         Cuboid cached = boundCache.get(boundId);
         if (cached != null) {
             return Optional.of(cached);
         }
-        Optional<Cuboid> resolved = ARENA_BOUND_ID.equals(boundId)
-            ? Optional.of(configManager.arenaCuboid())
-            : worldGuardHook.regionCuboid(world, boundId);
+        Optional<Cuboid> resolved;
+        if (ARENA_BOUND_ID.equals(boundId)) {
+            resolved = Optional.of(configManager.arenaCuboid());
+        } else {
+            String regionId = configManager.landRegionFor(boundId).orElse(boundId);
+            resolved = worldGuardHook.regionCuboid(world, regionId);
+        }
         resolved.ifPresent(cuboid -> boundCache.put(boundId, cuboid));
         return resolved;
     }

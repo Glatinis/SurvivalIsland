@@ -36,6 +36,11 @@ containment:
 
 islands: [ "island1", "island2", "island3" ]
 
+# Optional tighter WorldGuard regions (same order as "islands") used only for mob containment,
+# so leashed mobs stay off the water even when the islands above include some shoreline/ocean
+# buffer. Leave empty, or shorter than "islands", to just use each island's own region instead.
+islands-land: [ ]
+
 protection:
   default-mode: LOCKED
 
