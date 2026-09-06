@@ -138,6 +138,12 @@ Every tunable lives in `config.yml`, generated on first run. Contestant to islan
 | `duration-ticks` | `18000` | How long the freeze lasts (18000 ticks is 15 minutes) before automatically reverting. |
 | `region` | `"arena"` | WorldGuard region whose water is converted to ice. Falls back to the arena box below if the region does not exist. |
 | `slowness-amplifier` | `1` | Slowness effect level applied to every player while active. |
+| `snow-particles.interval-ticks` | `4` | How often a burst of falling-snow particles is spawned. |
+| `snow-particles.count-per-cycle` | `150` | How many particles spawn per burst. |
+| `snow-particles.height-above-area` | `4.0` | How far above the top of the deep-freeze area the particles start falling from. |
+| `snow-particles.speed` | `0.05` | Fall speed passed to the particle effect. |
+
+Each island's own region (from `islands`, not the tighter `islands-land` containment region) also gets a permanent thin snow layer over every exposed grass block the moment deep freeze turns on - see the `event deepfreeze` command above.
 
 ### containment
 
