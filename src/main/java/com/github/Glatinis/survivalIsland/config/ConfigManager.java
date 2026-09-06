@@ -121,6 +121,22 @@ public final class ConfigManager {
         return config().getInt("deep-freeze.slowness-amplifier", 1);
     }
 
+    public long deepFreezeSnowParticleIntervalTicks() {
+        return config().getLong("deep-freeze.snow-particles.interval-ticks", 4L);
+    }
+
+    public int deepFreezeSnowParticleCount() {
+        return config().getInt("deep-freeze.snow-particles.count-per-cycle", 150);
+    }
+
+    public double deepFreezeSnowParticleHeight() {
+        return config().getDouble("deep-freeze.snow-particles.height-above-area", 4.0);
+    }
+
+    public double deepFreezeSnowParticleSpeed() {
+        return config().getDouble("deep-freeze.snow-particles.speed", 0.05);
+    }
+
     public long containmentCheckIntervalTicks() {
         return config().getLong("containment.check-interval-ticks", 10L);
     }

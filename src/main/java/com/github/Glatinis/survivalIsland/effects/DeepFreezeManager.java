@@ -46,9 +46,6 @@ public final class DeepFreezeManager {
     private static final int SLOWNESS_DURATION_TICKS = 120;
     private static final int SNOWBALL_AMOUNT = 1;
     private static final int SNOWBALL_CHECK_INTERVAL_TICKS = 20;
-    private static final int SNOW_PARTICLE_INTERVAL_TICKS = 5;
-    private static final int SNOW_PARTICLES_PER_CYCLE = 30;
-    private static final double SNOW_PARTICLE_HEIGHT_ABOVE_AREA = 3.0;
 
     private final JavaPlugin plugin;
     private final ConfigManager configManager;
@@ -97,7 +94,8 @@ public final class DeepFreezeManager {
         snowballTask = SchedulerUtil.repeat(plugin, SNOWBALL_CHECK_INTERVAL_TICKS, SNOWBALL_CHECK_INTERVAL_TICKS,
             this::ensureSnowballs);
 
-        snowParticleTask = SchedulerUtil.repeat(plugin, SNOW_PARTICLE_INTERVAL_TICKS, SNOW_PARTICLE_INTERVAL_TICKS,
+        long particleInterval = configManager.deepFreezeSnowParticleIntervalTicks();
+        snowParticleTask = SchedulerUtil.repeat(plugin, particleInterval, particleInterval,
             () -> spawnSnowParticles(area));
 
         coverIslandsWithSnow();
@@ -161,26 +159,27 @@ public final class DeepFreezeManager {
         World world = area.world();
         double spanX = area.maxX() - area.minX();
         double spanZ = area.maxZ() - area.minZ();
-        double y = area.maxY() + SNOW_PARTICLE_HEIGHT_ABOVE_AREA;
-        for (int i = 0; i < SNOW_PARTICLES_PER_CYCLE; i++) {
+        double y = area.maxY() + configManager.deepFreezeSnowParticleHeight();
+        double speed = configManager.deepFreezeSnowParticleSpeed();
+        int count = configManager.deepFreezeSnowParticleCount();
+        for (int i = 0; i < count; i++) {
             double x = area.minX() + random.nextDouble() * spanX;
             double z = area.minZ() + random.nextDouble() * spanZ;
-            world.spawnParticle(Particle.SNOWFLAKE, x, y, z, 1, 0.0, 0.0, 0.0, 0.05);
+            world.spawnParticle(Particle.SNOWFLAKE, x, y, z, 1, 0.0, 0.0, 0.0, speed);
         }
     }
 
     /**
      * Places a single thin snow layer on top of every exposed grass block on each island - a
      * one-time, one-way pass, not something the periodic tasks re-apply or {@link #turnOff}
-     * reverts. Uses each island's tighter land-only region when one is configured (see
-     * {@link ConfigManager#landRegionFor}), same as mob containment, so it doesn't try to snow
-     * over open water.
+     * reverts. Deliberately uses each island's own (first) region from {@code islands}, not the
+     * tighter {@code islands-land} containment region, so the whole island gets snowed, not just
+     * the mob-containment box.
      */
     private void coverIslandsWithSnow() {
         World world = configManager.arenaCuboid().world();
         for (String islandId : configManager.islands()) {
-            String regionId = configManager.landRegionFor(islandId).orElse(islandId);
-            worldGuardHook.regionCuboid(world, regionId).ifPresent(this::coverWithSnow);
+            worldGuardHook.regionCuboid(world, islandId).ifPresent(this::coverWithSnow);
         }
     }
 

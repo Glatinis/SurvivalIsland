@@ -25,6 +25,11 @@ deep-freeze:
   duration-ticks: 18000
   region: "arena"
   slowness-amplifier: 1
+  snow-particles:
+    interval-ticks: 4
+    count-per-cycle: 150
+    height-above-area: 4.0
+    speed: 0.05
 
 containment:
   check-interval-ticks: 10
