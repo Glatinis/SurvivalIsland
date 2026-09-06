@@ -4,10 +4,11 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
- * Keeps the lives scoreboard in sync with players joining, dying, and leaving.
+ * Keeps the lives scoreboard in sync with players joining and dying. Quitting deliberately does
+ * nothing here: a contestant's row should stay visible to everyone else (with their last known
+ * lives) while they're briefly offline, not disappear the moment they disconnect.
  */
 public final class PlayerLifecycleListener implements Listener {
 
@@ -25,10 +26,5 @@ public final class PlayerLifecycleListener implements Listener {
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
         livesScoreboardService.decrement(event.getEntity());
-    }
-
-    @EventHandler
-    public void onQuit(PlayerQuitEvent event) {
-        livesScoreboardService.remove(event.getPlayer());
     }
 }

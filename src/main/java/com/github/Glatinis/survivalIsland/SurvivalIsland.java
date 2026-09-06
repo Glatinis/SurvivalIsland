@@ -33,6 +33,7 @@ import com.github.Glatinis.survivalIsland.worldcontrol.RuleSubCommand;
 import com.github.Glatinis.survivalIsland.worldcontrol.TheftListener;
 import com.github.Glatinis.survivalIsland.worldcontrol.TheftManager;
 import com.github.Glatinis.survivalIsland.worldcontrol.TntExplosionListener;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class SurvivalIsland extends JavaPlugin {
@@ -61,6 +62,11 @@ public final class SurvivalIsland extends JavaPlugin {
 
         livesScoreboardService = new LivesScoreboardService(this, configManager, contestantManager);
         livesScoreboardService.setup();
+        // re-apply immediately to anyone already online (e.g. after a /reload), so contestants
+        // don't have to rejoin for the board to come back.
+        for (Player onlinePlayer : getServer().getOnlinePlayers()) {
+            livesScoreboardService.refresh(onlinePlayer);
+        }
         getServer().getPluginManager().registerEvents(new PlayerLifecycleListener(livesScoreboardService), this);
 
         pvpManager = new PvpManager(configManager);

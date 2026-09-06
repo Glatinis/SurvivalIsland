@@ -27,7 +27,8 @@ import java.util.logging.Level;
  * server's shared main scoreboard, so it never shows in {@code /scoreboard objectives list} and
  * vanilla {@code /scoreboard players} commands can't read or change it (also meaning nothing
  * outside this plugin, accidentally or otherwise, can touch it - only reachable through
- * {@code /survivalisland lives} or a death). Only assigned contestants ever get a row on it.
+ * {@code /survivalisland lives} or a death). Every online player sees the board, but only
+ * assigned contestants ever get an actual row (a number) on it.
  *
  * <p>Two things make this resilient to what actually goes wrong on a live server:
  * <ul>
@@ -101,24 +102,23 @@ public final class LivesScoreboardService {
     }
 
     /**
-     * Shows the board and initializes a score for the player if they're an assigned contestant
-     * (restoring their last known value from {@code lives.yml} if the show has been through a
-     * restart since they last had a score); otherwise makes sure they don't have a stale row left
-     * over from before.
+     * Shows the board to the player unconditionally - everyone sees it, contestant or not - and,
+     * if they're an assigned contestant without a row yet, initializes one (restoring their last
+     * known value from {@code lives.yml} if the show has been through a restart since they last
+     * had a score). A non-contestant simply never gets a row, rather than being kept off the
+     * board entirely.
      */
     public void refresh(Player player) {
         if (scoreboard == null || objective == null) {
             return;
         }
+        player.setScoreboard(scoreboard);
         if (contestantManager.islandOf(player).isPresent()) {
-            player.setScoreboard(scoreboard);
             Score score = objective.getScore(player.getName());
             if (!score.isScoreSet()) {
                 int initial = persisted.getOrDefault(player.getUniqueId(), configManager.startingLives());
                 score.setScore(initial);
             }
-        } else {
-            remove(player);
         }
     }
 
@@ -165,23 +165,17 @@ public final class LivesScoreboardService {
     }
 
     /**
-     * Clears a player's row and takes the shared board off their screen entirely - without this,
-     * a removed contestant would keep seeing the board (with everyone else's rows) even though
-     * their own row is gone, since it's one shared Scoreboard object handed out to every
-     * contestant rather than one per viewer. Does not touch their persisted lives value - a
-     * player quitting (or momentarily not being a contestant during a reassignment) should not
-     * erase their progress; see {@link #forgetProgress} for genuine removal.
+     * Clears a contestant's row only - called when their contestant assignment is explicitly
+     * removed. Everyone always keeps seeing the board itself regardless of contestant status, so
+     * this deliberately does not touch the player's scoreboard assignment, only the row. Does not
+     * touch their persisted lives value either - that's a separate, explicit action; see
+     * {@link #forgetProgress}.
      */
-    public void remove(Player player) {
+    public void clearRow(Player player) {
         if (scoreboard == null) {
             return;
         }
         scoreboard.resetScores(player.getName());
-
-        ScoreboardManager manager = Bukkit.getScoreboardManager();
-        if (manager != null && player.getScoreboard().equals(scoreboard)) {
-            player.setScoreboard(manager.getMainScoreboard());
-        }
     }
 
     /**

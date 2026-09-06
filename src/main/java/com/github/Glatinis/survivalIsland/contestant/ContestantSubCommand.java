@@ -90,7 +90,7 @@ public final class ContestantSubCommand implements SubCommand {
             Messages.success(sender, "Removed " + args[1] + "'s island assignment.");
             Player online = player.getPlayer();
             if (online != null) {
-                livesScoreboardService.remove(online);
+                livesScoreboardService.clearRow(online);
             }
             livesScoreboardService.forgetProgress(player.getUniqueId());
         } else {
