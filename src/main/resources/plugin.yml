@@ -14,7 +14,7 @@ softdepend: [WorldEdit]
 commands:
   survivalisland:
     aliases: [si]
-    usage: /survivalisland <commandmode|event|rule|spawn|contestant|lives> ...
+    usage: /survivalisland <commandmode|event|rule|spawn|contestant|lives|chest> ...
     permission: survivalisland.admin
 
 permissions:

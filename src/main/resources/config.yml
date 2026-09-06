@@ -47,3 +47,50 @@ pvp:
 
 theft:
   default-enabled: false
+
+restocking-chests:
+  default-interval-ticks: 6000   # 5 minutes
+  default-item-count: 5          # random rolls placed in the chest per restock
+  # "material" must be a valid Bukkit Material name. "potion" is only read for POTION,
+  # SPLASH_POTION, and LINGERING_POTION and must be a valid PotionType name. "weight" controls
+  # how likely an entry is relative to the others - the music discs and special eggs below are
+  # weighted much lower than the common pool so they feel rare.
+  loot-pool:
+    - { material: PRISMARINE_SHARD, amount: 5, weight: 10 }
+    - { material: SPECTRAL_ARROW, amount: 6, weight: 10 }
+    - { material: SPYGLASS, amount: 1, weight: 10 }
+    - { material: EGG, amount: 10, weight: 10 }
+    - { material: WIND_CHARGE, amount: 1, weight: 10 }
+    - { material: AXOLOTL_BUCKET, amount: 1, weight: 10 }
+    - { material: COAST_ARMOR_TRIM_SMITHING_TEMPLATE, amount: 1, weight: 10 }
+    - { material: GREEN_BUNDLE, amount: 1, weight: 10 }
+    - { material: LIME_BUNDLE, amount: 1, weight: 10 }
+    - { material: NAME_TAG, amount: 1, weight: 10 }
+    - { material: LILY_PAD, amount: 2, weight: 10 }
+    - { material: BAMBOO_CHEST_RAFT, amount: 1, weight: 10 }
+    - { material: BAMBOO, amount: 1, weight: 10 }
+    - { material: FLINT, amount: 1, weight: 10 }
+    - { material: HONEYCOMB, amount: 4, weight: 10 }
+    - { material: SAND, amount: 5, weight: 10 }
+    - { material: BEE_SPAWN_EGG, amount: 1, weight: 10 }
+    - { material: SEA_PICKLE, amount: 1, weight: 10 }
+    - { material: WANDERING_TRADER_SPAWN_EGG, amount: 1, weight: 10 }
+    - { material: GLOW_BERRIES, amount: 1, weight: 10 }
+    - { material: FROGSPAWN, amount: 1, weight: 10 }
+    - { material: GOLDEN_CARROT, amount: 1, weight: 10 }
+    - { material: CAKE, amount: 1, weight: 10 }
+    - { material: LEAD, amount: 1, weight: 10 }
+    - { material: CLAY, amount: 1, weight: 10 }
+    - { material: COCOA_BEANS, amount: 1, weight: 10 }
+    - { material: JUNGLE_LOG, amount: 1, weight: 10 }
+    - { material: SPORE_BLOSSOM, amount: 1, weight: 10 }
+    - { material: LINGERING_POTION, amount: 1, weight: 10, potion: OOZING }
+    - { material: RABBIT_STEW, amount: 1, weight: 10 }
+    - { material: POTION, amount: 1, weight: 10, potion: INVISIBILITY }
+    - { material: SUGAR_CANE, amount: 1, weight: 10 }
+    - { material: CACTUS, amount: 1, weight: 10 }
+    - { material: PARROT_SPAWN_EGG, amount: 1, weight: 2 }
+    - { material: JUKEBOX, amount: 1, weight: 2 }
+    - { material: MUSIC_DISC_CAT, amount: 1, weight: 1 }
+    - { material: MUSIC_DISC_PRECIPICE, amount: 1, weight: 1 }
+    - { material: MUSIC_DISC_CREATOR, amount: 1, weight: 1 }

@@ -1,15 +1,20 @@
 package com.github.Glatinis.survivalIsland.config;
 
+import com.github.Glatinis.survivalIsland.loot.LootEntry;
 import com.github.Glatinis.survivalIsland.util.Cuboid;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionType;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -164,5 +169,29 @@ public final class ConfigManager {
 
     public boolean theftDefaultEnabled() {
         return config().getBoolean("theft.default-enabled", false);
+    }
+
+    public long restockDefaultIntervalTicks() {
+        return config().getLong("restocking-chests.default-interval-ticks", 6000L);
+    }
+
+    public int restockDefaultItemCount() {
+        return config().getInt("restocking-chests.default-item-count", 5);
+    }
+
+    public List<LootEntry> lootPool() {
+        List<LootEntry> entries = new ArrayList<>();
+        for (Map<?, ?> raw : config().getMapList("restocking-chests.loot-pool")) {
+            try {
+                Material material = Material.valueOf(String.valueOf(raw.get("material")));
+                int amount = raw.get("amount") instanceof Number number ? number.intValue() : 1;
+                int weight = raw.get("weight") instanceof Number number ? number.intValue() : 1;
+                PotionType potionType = raw.get("potion") != null ? PotionType.valueOf(String.valueOf(raw.get("potion"))) : null;
+                entries.add(new LootEntry(material, amount, weight, potionType));
+            } catch (IllegalArgumentException ex) {
+                plugin.getLogger().warning("Invalid loot pool entry, skipping: " + raw);
+            }
+        }
+        return entries;
     }
 }

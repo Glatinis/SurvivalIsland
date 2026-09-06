@@ -19,6 +19,9 @@ import com.github.Glatinis.survivalIsland.integration.WorldGuardHook;
 import com.github.Glatinis.survivalIsland.lives.LivesScoreboardService;
 import com.github.Glatinis.survivalIsland.lives.LivesSubCommand;
 import com.github.Glatinis.survivalIsland.lives.PlayerLifecycleListener;
+import com.github.Glatinis.survivalIsland.loot.ChestSubCommand;
+import com.github.Glatinis.survivalIsland.loot.RestockingChestBreakListener;
+import com.github.Glatinis.survivalIsland.loot.RestockingChestManager;
 import com.github.Glatinis.survivalIsland.worldcontrol.DragonBlockGuardListener;
 import com.github.Glatinis.survivalIsland.worldcontrol.DragonControlManager;
 import com.github.Glatinis.survivalIsland.worldcontrol.ProtectionListener;
@@ -42,6 +45,7 @@ public final class SurvivalIsland extends JavaPlugin {
     private ProtectionManager protectionManager;
     private EntityBoundsGuard entityBoundsGuard;
     private AcidOceanManager acidOceanManager;
+    private RestockingChestManager restockingChestManager;
     private SurvivalIslandCommand rootCommand;
 
     @Override
@@ -95,6 +99,11 @@ public final class SurvivalIsland extends JavaPlugin {
 
         rootCommand.register(new EventSubCommand(acidRainManager, acidOceanManager, deepFreezeManager, dragonControlManager));
 
+        restockingChestManager = new RestockingChestManager(this, configManager);
+        restockingChestManager.load();
+        getServer().getPluginManager().registerEvents(new RestockingChestBreakListener(restockingChestManager), this);
+        rootCommand.register(new ChestSubCommand(restockingChestManager));
+
         getCommand("survivalisland").setExecutor(rootCommand);
         getCommand("survivalisland").setTabCompleter(rootCommand);
     }
@@ -106,6 +115,9 @@ public final class SurvivalIsland extends JavaPlugin {
         }
         if (acidOceanManager != null) {
             acidOceanManager.stopTask();
+        }
+        if (restockingChestManager != null) {
+            restockingChestManager.stop();
         }
     }
 
