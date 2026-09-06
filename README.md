@@ -59,7 +59,7 @@ Only assigned contestants get a row on the lives scoreboard, and only they can b
 | --- | --- |
 | `/survivalisland event acidrain <player\|all> <start\|stop>` | Personal acid rainstorm: damages the target and nearby island animals, applies poison. |
 | `/survivalisland event acidocean <player\|all> <start\|stop>` | Water becomes lethal like lava (without fire) plus poison for the target. |
-| `/survivalisland event deepfreeze <on\|off>` | Converts water to ice in the configured area and slows every player for the configured duration. |
+| `/survivalisland event deepfreeze <on\|off>` | Converts water to ice in the configured area and slows every player for the configured duration. Every contestant is also given an unlimited "Deepfreeze!" snowball for the duration, taken away again when it ends. |
 | `/survivalisland event enderdragon destruction <on\|off>` | Allows or blocks ender dragons from destroying blocks. |
 
 ### Spawn
