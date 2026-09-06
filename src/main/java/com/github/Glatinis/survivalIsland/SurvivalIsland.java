@@ -1,5 +1,6 @@
 package com.github.Glatinis.survivalIsland;
 
+import com.github.Glatinis.survivalIsland.command.ReloadSubCommand;
 import com.github.Glatinis.survivalIsland.command.SurvivalIslandCommand;
 import com.github.Glatinis.survivalIsland.commandmode.CommandModeChatListener;
 import com.github.Glatinis.survivalIsland.commandmode.CommandModeManager;
@@ -85,6 +86,7 @@ public final class SurvivalIsland extends JavaPlugin {
             new MobLeashListener(entityBoundsGuard, worldGuardHook, configManager), this);
 
         rootCommand = new SurvivalIslandCommand();
+        rootCommand.register(new ReloadSubCommand(configManager, entityBoundsGuard));
         rootCommand.register(new ContestantSubCommand(contestantManager, configManager, livesScoreboardService));
         rootCommand.register(new LivesSubCommand(livesScoreboardService, contestantManager));
         rootCommand.register(new RuleSubCommand(pvpManager, theftManager, protectionManager));

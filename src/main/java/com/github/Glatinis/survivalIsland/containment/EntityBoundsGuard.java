@@ -58,6 +58,15 @@ public final class EntityBoundsGuard {
     }
 
     /**
+     * Drops every cached region-to-Cuboid resolution, so the next containment check re-resolves
+     * bounds fresh from WorldGuard/config - needed after a {@code /survivalisland reload}, since
+     * bounds are otherwise cached forever once first resolved.
+     */
+    public void clearBoundCache() {
+        boundCache.clear();
+    }
+
+    /**
      * Tags the entity with the given bound id and starts tracking it against that bound.
      */
     public void track(Entity entity, String boundId) {
