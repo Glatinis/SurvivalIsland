@@ -36,7 +36,7 @@ All commands live under `/survivalisland` (alias `/si`) and require the `surviva
 
 ### Lives
 
-Only assigned contestants get a row on the lives scoreboard, and only they can be targeted by these commands. The board is a private scoreboard the plugin manages itself, not the server's shared main scoreboard, so it will not appear in `/scoreboard objectives list` and vanilla `/scoreboard players` commands cannot read or change it. Use the commands below instead.
+Every online player sees the lives board, but only assigned contestants get an actual row (a number) on it, and only they can be targeted by these commands. The board is a private scoreboard the plugin manages itself, not the server's shared main scoreboard, so it will not appear in `/scoreboard objectives list` and vanilla `/scoreboard players` commands cannot read or change it. Use the commands below instead.
 
 | Command | Description |
 | --- | --- |
