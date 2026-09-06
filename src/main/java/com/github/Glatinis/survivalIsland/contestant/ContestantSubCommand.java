@@ -92,6 +92,7 @@ public final class ContestantSubCommand implements SubCommand {
             if (online != null) {
                 livesScoreboardService.remove(online);
             }
+            livesScoreboardService.forgetProgress(player.getUniqueId());
         } else {
             Messages.error(sender, args[1] + " isn't assigned to an island.");
         }

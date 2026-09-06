@@ -112,6 +112,9 @@ public final class SurvivalIsland extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (livesScoreboardService != null) {
+            livesScoreboardService.shutdown();
+        }
         if (entityBoundsGuard != null) {
             entityBoundsGuard.stop();
         }
