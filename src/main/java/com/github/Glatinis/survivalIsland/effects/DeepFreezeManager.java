@@ -14,6 +14,9 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.type.Snow;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
@@ -32,6 +35,10 @@ import java.util.Random;
  * configured area to ice, plus a global slowness effect and falling-snow particles over the same
  * area, for a fixed duration or until turned off early - all reverted the same way either way.
  * While active, every contestant also carries a "Deepfreeze!" snowball that never runs out.
+ *
+ * <p>One part is deliberately one-way: every exposed grass block on each island gets a thin snow
+ * layer on top the moment it turns on. That snow is not cleared when it turns off - it's a
+ * lasting mark of the freeze, not a temporary effect like the ice or the particles.
  */
 public final class DeepFreezeManager {
 
@@ -92,6 +99,8 @@ public final class DeepFreezeManager {
 
         snowParticleTask = SchedulerUtil.repeat(plugin, SNOW_PARTICLE_INTERVAL_TICKS, SNOW_PARTICLE_INTERVAL_TICKS,
             () -> spawnSnowParticles(area));
+
+        coverIslandsWithSnow();
 
         autoOffTask = SchedulerUtil.later(plugin, configManager.deepFreezeDurationTicks(), this::turnOff);
     }
@@ -157,6 +166,47 @@ public final class DeepFreezeManager {
             double x = area.minX() + random.nextDouble() * spanX;
             double z = area.minZ() + random.nextDouble() * spanZ;
             world.spawnParticle(Particle.SNOWFLAKE, x, y, z, 1, 0.0, 0.0, 0.0, 0.05);
+        }
+    }
+
+    /**
+     * Places a single thin snow layer on top of every exposed grass block on each island - a
+     * one-time, one-way pass, not something the periodic tasks re-apply or {@link #turnOff}
+     * reverts. Uses each island's tighter land-only region when one is configured (see
+     * {@link ConfigManager#landRegionFor}), same as mob containment, so it doesn't try to snow
+     * over open water.
+     */
+    private void coverIslandsWithSnow() {
+        World world = configManager.arenaCuboid().world();
+        for (String islandId : configManager.islands()) {
+            String regionId = configManager.landRegionFor(islandId).orElse(islandId);
+            worldGuardHook.regionCuboid(world, regionId).ifPresent(this::coverWithSnow);
+        }
+    }
+
+    private void coverWithSnow(Cuboid area) {
+        World world = area.world();
+        int minX = (int) Math.floor(area.minX());
+        int maxX = (int) Math.floor(area.maxX());
+        int minZ = (int) Math.floor(area.minZ());
+        int maxZ = (int) Math.floor(area.maxZ());
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                Block ground = world.getHighestBlockAt(x, z);
+                if (ground.getType() != Material.GRASS_BLOCK) {
+                    continue;
+                }
+                Block above = ground.getRelative(BlockFace.UP);
+                if (above.getType() != Material.AIR) {
+                    continue;
+                }
+                above.setType(Material.SNOW);
+                if (above.getBlockData() instanceof Snow snow) {
+                    snow.setLayers(snow.getMinimumLayers());
+                    above.setBlockData(snow);
+                }
+            }
         }
     }
 
