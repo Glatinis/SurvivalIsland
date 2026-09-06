@@ -5,6 +5,7 @@ import com.github.Glatinis.survivalIsland.contestant.ContestantManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -119,6 +120,7 @@ public final class LivesScoreboardService {
                 int initial = persisted.getOrDefault(player.getUniqueId(), configManager.startingLives());
                 score.setScore(initial);
             }
+            applyEliminationState(player, score.getScore());
         }
     }
 
@@ -130,6 +132,7 @@ public final class LivesScoreboardService {
         int updated = Math.max(0, score.getScore() - 1);
         score.setScore(updated);
         setPersisted(player.getUniqueId(), updated);
+        applyEliminationState(player, updated);
     }
 
     /**
@@ -141,6 +144,7 @@ public final class LivesScoreboardService {
         if (objective != null) {
             objective.getScore(player.getName()).setScore(clamped);
             setPersisted(player.getUniqueId(), clamped);
+            applyEliminationState(player, clamped);
         }
         return clamped;
     }
@@ -161,7 +165,24 @@ public final class LivesScoreboardService {
         int updated = (int) Math.min(updatedLong, Integer.MAX_VALUE);
         score.setScore(updated);
         setPersisted(player.getUniqueId(), updated);
+        applyEliminationState(player, updated);
         return updated;
+    }
+
+    /**
+     * Puts a contestant into spectator mode the moment their lives hit 0, and pulls them back
+     * into survival mode if their lives go from 0 back to a positive number (a manual revive via
+     * {@code /survivalisland lives add}). Only touches game mode on an actual state change, never
+     * fights a manually-set spectator mode that isn't the result of hitting 0 lives.
+     */
+    private void applyEliminationState(Player player, int lives) {
+        if (lives <= 0) {
+            if (player.getGameMode() != GameMode.SPECTATOR) {
+                player.setGameMode(GameMode.SPECTATOR);
+            }
+        } else if (player.getGameMode() == GameMode.SPECTATOR) {
+            player.setGameMode(GameMode.SURVIVAL);
+        }
     }
 
     /**
