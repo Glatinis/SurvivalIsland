@@ -35,7 +35,7 @@ public final class DeepFreezeManager {
 
     private static final int SLOWNESS_REFRESH_INTERVAL_TICKS = 100;
     private static final int SLOWNESS_DURATION_TICKS = 120;
-    private static final int SNOWBALL_STACK_SIZE = 64;
+    private static final int SNOWBALL_AMOUNT = 1;
 
     private final JavaPlugin plugin;
     private final ConfigManager configManager;
@@ -125,7 +125,7 @@ public final class DeepFreezeManager {
     }
 
     private ItemStack createSnowball() {
-        ItemStack item = new ItemStack(Material.SNOWBALL, SNOWBALL_STACK_SIZE);
+        ItemStack item = new ItemStack(Material.SNOWBALL, SNOWBALL_AMOUNT);
         ItemMeta meta = item.getItemMeta();
         meta.displayName(Component.text("Deepfreeze!", NamedTextColor.BLUE, TextDecoration.BOLD));
         // a nonsense enchant just to make it glow - the level/category restriction is deliberately
