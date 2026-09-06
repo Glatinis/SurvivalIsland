@@ -15,11 +15,12 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 
 /**
- * Owns the sidebar "lives" objective. Only assigned contestants ever get a row on it - the
- * Score itself is still the only store of truth for a contestant's lives (no separate in-memory
- * map), so an admin can also just run the vanilla
- * {@code /scoreboard players set <player> lives <value>} command and it works, on top of the
- * dedicated {@code /survivalisland lives} command.
+ * Owns the sidebar "lives" objective on a private scoreboard the plugin manages itself, not the
+ * server's shared main scoreboard, so it never shows in {@code /scoreboard objectives list} and
+ * vanilla {@code /scoreboard players} commands can't read or change it. Only assigned contestants
+ * ever get a row on it; the Score itself is still the only store of truth for a contestant's
+ * lives (no separate in-memory map), it's just only reachable through
+ * {@code /survivalisland lives} rather than the vanilla command.
  */
 public final class LivesScoreboardService {
 

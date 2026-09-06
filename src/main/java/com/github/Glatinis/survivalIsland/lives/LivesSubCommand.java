@@ -13,8 +13,9 @@ import java.util.stream.Collectors;
 
 /**
  * {@code /survivalisland lives <set|add|remove> <player> <amount>} - manual lives adjustment for
- * a contestant, on top of the vanilla {@code /scoreboard players} command which also still works
- * since the Score is the only store of truth.
+ * a contestant. The lives board is a private scoreboard, not the server's main one, so this is
+ * the only way to change a contestant's lives (the vanilla {@code /scoreboard players} command
+ * can't reach it).
  */
 public final class LivesSubCommand implements SubCommand {
 
