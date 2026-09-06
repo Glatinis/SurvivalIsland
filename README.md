@@ -44,6 +44,8 @@ Only assigned contestants get a row on the lives scoreboard, and only they can b
 | `/survivalisland lives add <player> <amount>` | Adds to a contestant's lives. |
 | `/survivalisland lives remove <player> <amount>` | Subtracts from a contestant's lives. |
 
+Every lives value is mirrored to `lives.yml` as it changes and restored automatically, so a server crash or restart mid-show does not reset anyone's lives back to full. Removing a contestant clears their saved value too, so a later re-add starts them fresh rather than resuming their old count.
+
 ### Rule
 
 | Command | Description |
