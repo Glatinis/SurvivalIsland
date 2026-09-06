@@ -104,10 +104,21 @@ public final class LivesScoreboardService {
         return updated;
     }
 
+    /**
+     * Clears a player's row and takes the shared board off their screen entirely - without this,
+     * a removed contestant would keep seeing the board (with everyone else's rows) even though
+     * their own row is gone, since it's one shared Scoreboard object handed out to every
+     * contestant rather than one per viewer.
+     */
     public void remove(Player player) {
         if (scoreboard == null) {
             return;
         }
         scoreboard.resetScores(player.getName());
+
+        ScoreboardManager manager = Bukkit.getScoreboardManager();
+        if (manager != null && player.getScoreboard().equals(scoreboard)) {
+            player.setScoreboard(manager.getMainScoreboard());
+        }
     }
 }
