@@ -12,9 +12,10 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -24,27 +25,35 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitTask;
 
+import java.util.Random;
+
 /**
  * Deep Freeze: a real (non-visual-only) WorldEdit block conversion of every water block in the
- * configured area to ice, plus a global slowness effect, for a fixed duration or until turned off
- * early - reverted the same way (ice back to water) either way. While active, every contestant
- * also carries an unlimited "Deepfreeze!" snowball (see {@link #restockHand}), taken away again
- * the moment it turns off.
+ * configured area to ice, plus a global slowness effect and falling-snow particles over the same
+ * area, for a fixed duration or until turned off early - all reverted the same way either way.
+ * While active, every contestant also carries a "Deepfreeze!" snowball that never runs out.
  */
 public final class DeepFreezeManager {
 
     private static final int SLOWNESS_REFRESH_INTERVAL_TICKS = 100;
     private static final int SLOWNESS_DURATION_TICKS = 120;
     private static final int SNOWBALL_AMOUNT = 1;
+    private static final int SNOWBALL_CHECK_INTERVAL_TICKS = 20;
+    private static final int SNOW_PARTICLE_INTERVAL_TICKS = 5;
+    private static final int SNOW_PARTICLES_PER_CYCLE = 30;
+    private static final double SNOW_PARTICLE_HEIGHT_ABOVE_AREA = 3.0;
 
     private final JavaPlugin plugin;
     private final ConfigManager configManager;
     private final WorldGuardHook worldGuardHook;
     private final ContestantManager contestantManager;
     private final NamespacedKey snowballKey;
+    private final Random random = new Random();
 
     private boolean active;
     private BukkitTask slownessTask;
+    private BukkitTask snowballTask;
+    private BukkitTask snowParticleTask;
     private BukkitTask autoOffTask;
 
     public DeepFreezeManager(JavaPlugin plugin, ConfigManager configManager, WorldGuardHook worldGuardHook,
@@ -66,18 +75,23 @@ public final class DeepFreezeManager {
         }
         active = true;
 
-        worldGuardHook.replaceBlocks(resolveArea(), BlockTypes.WATER, BlockTypes.ICE);
+        Cuboid area = resolveArea();
+        worldGuardHook.replaceBlocks(area, BlockTypes.WATER, BlockTypes.ICE);
 
         int amplifier = configManager.deepFreezeSlownessAmplifier();
         applySlownessToAll(amplifier);
         slownessTask = SchedulerUtil.repeat(plugin, SLOWNESS_REFRESH_INTERVAL_TICKS, SLOWNESS_REFRESH_INTERVAL_TICKS,
             () -> applySlownessToAll(amplifier));
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            if (contestantManager.islandOf(player).isPresent()) {
-                player.getInventory().addItem(createSnowball());
-            }
-        }
+        // Every contestant is topped back up to one Deepfreeze snowball on a short timer rather
+        // than reacting to each individual throw - simpler, and self-healing regardless of why a
+        // single throw's item might otherwise be lost (a cancelled event, a dropped item, etc.).
+        ensureSnowballs();
+        snowballTask = SchedulerUtil.repeat(plugin, SNOWBALL_CHECK_INTERVAL_TICKS, SNOWBALL_CHECK_INTERVAL_TICKS,
+            this::ensureSnowballs);
+
+        snowParticleTask = SchedulerUtil.repeat(plugin, SNOW_PARTICLE_INTERVAL_TICKS, SNOW_PARTICLE_INTERVAL_TICKS,
+            () -> spawnSnowParticles(area));
 
         autoOffTask = SchedulerUtil.later(plugin, configManager.deepFreezeDurationTicks(), this::turnOff);
     }
@@ -90,38 +104,68 @@ public final class DeepFreezeManager {
 
         worldGuardHook.replaceBlocks(resolveArea(), BlockTypes.ICE, BlockTypes.WATER);
 
-        if (slownessTask != null) {
-            slownessTask.cancel();
-            slownessTask = null;
-        }
-        if (autoOffTask != null) {
-            autoOffTask.cancel();
-            autoOffTask = null;
-        }
+        cancel(slownessTask);
+        slownessTask = null;
+        cancel(snowballTask);
+        snowballTask = null;
+        cancel(snowParticleTask);
+        snowParticleTask = null;
+        cancel(autoOffTask);
+        autoOffTask = null;
+
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.removePotionEffect(PotionEffectType.SLOWNESS);
             removeSnowballs(player);
         }
     }
 
-    public boolean isDeepfreezeSnowball(ItemStack item) {
+    private void cancel(BukkitTask task) {
+        if (task != null) {
+            task.cancel();
+        }
+    }
+
+    private void ensureSnowballs() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            if (contestantManager.islandOf(player).isEmpty()) {
+                continue;
+            }
+            if (!hasSnowball(player)) {
+                player.getInventory().addItem(createSnowball());
+            }
+        }
+    }
+
+    private boolean hasSnowball(Player player) {
+        if (isDeepfreezeSnowball(player.getInventory().getItemInOffHand())) {
+            return true;
+        }
+        for (ItemStack item : player.getInventory().getContents()) {
+            if (isDeepfreezeSnowball(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void spawnSnowParticles(Cuboid area) {
+        World world = area.world();
+        double spanX = area.maxX() - area.minX();
+        double spanZ = area.maxZ() - area.minZ();
+        double y = area.maxY() + SNOW_PARTICLE_HEIGHT_ABOVE_AREA;
+        for (int i = 0; i < SNOW_PARTICLES_PER_CYCLE; i++) {
+            double x = area.minX() + random.nextDouble() * spanX;
+            double z = area.minZ() + random.nextDouble() * spanZ;
+            world.spawnParticle(Particle.SNOWFLAKE, x, y, z, 1, 0.0, 0.0, 0.0, 0.05);
+        }
+    }
+
+    private boolean isDeepfreezeSnowball(ItemStack item) {
         if (item == null || item.getType() != Material.SNOWBALL) {
             return false;
         }
         ItemMeta meta = item.getItemMeta();
         return meta != null && meta.getPersistentDataContainer().has(snowballKey, PersistentDataType.BYTE);
-    }
-
-    /**
-     * Replaces whatever is left in the given hand with a fresh full stack - called a tick after
-     * a Deepfreeze snowball is thrown, so it's effectively unlimited no matter how many are used.
-     */
-    public void restockHand(Player player, EquipmentSlot hand) {
-        if (hand == EquipmentSlot.OFF_HAND) {
-            player.getInventory().setItemInOffHand(createSnowball());
-        } else {
-            player.getInventory().setItemInMainHand(createSnowball());
-        }
     }
 
     private ItemStack createSnowball() {

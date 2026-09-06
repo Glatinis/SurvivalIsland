@@ -14,7 +14,6 @@ import com.github.Glatinis.survivalIsland.contestant.ContestantSubCommand;
 import com.github.Glatinis.survivalIsland.effects.AcidOceanManager;
 import com.github.Glatinis.survivalIsland.effects.AcidRainManager;
 import com.github.Glatinis.survivalIsland.effects.DeepFreezeManager;
-import com.github.Glatinis.survivalIsland.effects.DeepFreezeSnowballListener;
 import com.github.Glatinis.survivalIsland.effects.EventSubCommand;
 import com.github.Glatinis.survivalIsland.integration.WorldGuardHook;
 import com.github.Glatinis.survivalIsland.lives.LivesScoreboardService;
@@ -99,7 +98,6 @@ public final class SurvivalIsland extends JavaPlugin {
         acidOceanManager = new AcidOceanManager(this, configManager, contestantManager, worldGuardHook);
         acidOceanManager.start();
         DeepFreezeManager deepFreezeManager = new DeepFreezeManager(this, configManager, worldGuardHook, contestantManager);
-        getServer().getPluginManager().registerEvents(new DeepFreezeSnowballListener(deepFreezeManager, this), this);
 
         DragonControlManager dragonControlManager = new DragonControlManager();
         getServer().getPluginManager().registerEvents(
