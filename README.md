@@ -26,6 +26,10 @@ A Paper plugin for running a multi-island survival show: a lives based eliminati
 
 All commands live under `/survivalisland` (alias `/si`) and require the `survivalisland.admin` permission unless noted otherwise.
 
+| Command | Description |
+| --- | --- |
+| `/survivalisland reload` | Reloads `config.yml` and clears the containment bounds cache, so region/arena changes take effect without a restart. Everything else already reads its config values fresh on every use. |
+
 ### Contestant
 
 | Command | Description |
